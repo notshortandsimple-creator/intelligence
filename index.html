@@ -18,44 +18,98 @@
 
     .imp {
       font-family: 'Courier New', Courier, monospace;
-      background: #0d0d0d;
+      background: #0a0a0a;
       color: #cccccc;
       width: 100%;
       max-width: 680px;
       border: 2px solid #444;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .holo-flicker {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(200,200,200,0.012) 3px,
+        rgba(200,200,200,0.012) 4px
+      );
+      animation: flicker 8s infinite;
+    }
+
+    .holo-sweep {
+      position: absolute;
+      left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, rgba(200,200,200,0.03), transparent);
+      pointer-events: none;
+      z-index: 11;
+      animation: sweep 6s linear infinite;
+    }
+
+    .holo-vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9;
+      box-shadow: inset 0 0 80px rgba(0,0,0,0.7), inset 0 0 20px rgba(180,180,180,0.03);
+    }
+
+    @keyframes flicker {
+      0%,100%  { opacity: 1; }
+      92%      { opacity: 1; }
+      92.5%    { opacity: 0.82; }
+      93%      { opacity: 1; }
+      96%      { opacity: 1; }
+      96.3%    { opacity: 0.88; }
+      96.6%    { opacity: 1; }
+    }
+
+    @keyframes sweep {
+      0%   { top: -60px; }
+      100% { top: 100%; }
     }
 
     .imp-topbar {
-      background: #1a1a1a;
-      border-bottom: 2px solid #444;
+      background: #111;
+      border-bottom: 1px solid #333;
       padding: 6px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: relative;
+      z-index: 5;
     }
     .imp-topbar .dots { display: flex; gap: 6px; }
     .imp-topbar .dot {
       width: 10px; height: 10px;
       border-radius: 50%;
-      background: #333;
-      border: 1px solid #555;
+      background: #222;
+      border: 1px solid #444;
     }
     .imp-topbar .sys { font-size: 10px; letter-spacing: 3px; color: #555; }
 
     .imp-header {
-      background: #111;
+      background: #0d0d0d;
       border-bottom: 1px solid #333;
       padding: 1.5rem 2rem 1rem;
       display: flex;
       align-items: center;
       gap: 1.5rem;
+      position: relative;
+      z-index: 5;
     }
     .imp-cog { flex-shrink: 0; width: 56px; height: 56px; }
-    .imp-brand .empire { font-size: 10px; letter-spacing: 5px; color: #666; margin-bottom: 2px; }
-    .imp-brand .title  { font-size: 17px; letter-spacing: 4px; color: #e8e8e8; font-weight: bold; }
-    .imp-brand .sub    { font-size: 9px; letter-spacing: 3px; color: #555; margin-top: 3px; }
+    .imp-brand .empire { font-size: 10px; letter-spacing: 5px; color: #555; margin-bottom: 2px; }
+    .imp-brand .title  { font-size: 17px; letter-spacing: 4px; color: #e8e8e8; font-weight: bold; text-shadow: 0 0 12px rgba(220,220,220,0.25); }
+    .imp-brand .sub    { font-size: 9px; letter-spacing: 3px; color: #444; margin-top: 3px; }
 
-    .imp-body { padding: 1.5rem 2rem; }
+    .imp-body { padding: 1.5rem 2rem; position: relative; z-index: 5; }
 
     .meta-grid {
       display: grid;
@@ -68,8 +122,8 @@
       border-right: 1px solid #2a2a2a;
       border-bottom: 1px solid #2a2a2a;
     }
-    .meta-cell:nth-child(2n)       { border-right: none; }
-    .meta-cell:nth-last-child(-n+2){ border-bottom: none; }
+    .meta-cell:nth-child(2n)        { border-right: none; }
+    .meta-cell:nth-last-child(-n+2) { border-bottom: none; }
     .meta-label { font-size: 9px; letter-spacing: 3px; color: #555; margin-bottom: 2px; }
     .meta-val   { font-size: 12px; color: #bbb; letter-spacing: 1px; }
 
@@ -83,7 +137,14 @@
       align-items: center;
       gap: 10px;
     }
-    .priority-bar .pip { width: 8px; height: 8px; background: #cc0000; border-radius: 50%; flex-shrink: 0; }
+    .priority-bar .pip {
+      width: 8px; height: 8px;
+      background: #cc2222;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pippulse 2s ease-in-out infinite;
+    }
+    @keyframes pippulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
     .priority-bar span { font-size: 10px; letter-spacing: 3px; color: #cc4444; }
 
     .section-head {
@@ -98,7 +159,7 @@
     .report-text { font-size: 12px; color: #aaa; line-height: 1.9; margin-bottom: 1.5rem; }
 
     .cipher-block {
-      background: #0a0a0a;
+      background: #080808;
       border: 1px solid #333;
       border-top: 3px solid #666;
       padding: 1rem 1.25rem;
@@ -108,21 +169,15 @@
       justify-content: space-between;
     }
     .cipher-label { font-size: 9px; letter-spacing: 3px; color: #555; margin-bottom: 6px; }
-    .cipher-val   { font-size: 16px; letter-spacing: 3px; color: #e8e8e8; }
-    .enc-tag {
-      font-size: 9px;
-      letter-spacing: 2px;
-      color: #555;
-      border: 1px solid #333;
-      padding: 4px 8px;
-    }
+    .cipher-val   { font-size: 16px; letter-spacing: 3px; color: #e8e8e8; text-shadow: 0 0 10px rgba(220,220,220,0.3); }
+    .enc-tag { font-size: 9px; letter-spacing: 2px; color: #555; border: 1px solid #2a2a2a; padding: 4px 8px; }
 
     .input-section { border-top: 1px solid #222; padding-top: 1.25rem; }
     .input-label   { font-size: 9px; letter-spacing: 3px; color: #555; margin-bottom: 8px; }
     .input-row     { display: flex; }
 
     input[type="text"] {
-      background: #0a0a0a;
+      background: #080808;
       border: 1px solid #333;
       border-right: none;
       color: #e8e8e8;
@@ -133,11 +188,13 @@
       flex: 1;
       outline: none;
       height: 40px;
+      caret-color: #aaa;
     }
     input[type="text"]:focus { border-color: #666; }
+    input[type="text"]::placeholder { color: #333; }
 
     button {
-      background: #1a1a1a;
+      background: #111;
       border: 1px solid #444;
       color: #aaa;
       font-family: 'Courier New', Courier, monospace;
@@ -147,8 +204,9 @@
       cursor: pointer;
       height: 40px;
       white-space: nowrap;
+      transition: all 0.1s;
     }
-    button:hover { background: #252525; color: #e8e8e8; }
+    button:hover { background: #1a1a1a; color: #e8e8e8; border-color: #666; }
 
     #result {
       font-size: 10px;
@@ -161,11 +219,13 @@
     #result.ok   { color: #4a8a4a; }
 
     .imp-footer {
-      background: #111;
+      background: #0d0d0d;
       border-top: 1px solid #222;
       padding: 8px 2rem;
       display: flex;
       justify-content: space-between;
+      position: relative;
+      z-index: 5;
     }
     .imp-footer span { font-size: 9px; letter-spacing: 2px; color: #3a3a3a; }
 
@@ -175,6 +235,9 @@
 </head>
 <body>
 <div class="imp">
+  <div class="holo-flicker"></div>
+  <div class="holo-sweep"></div>
+  <div class="holo-vignette"></div>
 
   <div class="imp-topbar">
     <div class="dots">
@@ -188,9 +251,9 @@
 
   <div class="imp-header">
     <svg class="imp-cog" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="28" cy="28" r="26" stroke="#444" stroke-width="1.5" fill="#0d0d0d"/>
+      <circle cx="28" cy="28" r="26" stroke="#444" stroke-width="1.5" fill="#0a0a0a"/>
       <circle cx="28" cy="28" r="19" stroke="#555" stroke-width="1" fill="none"/>
-      <circle cx="28" cy="28" r="8"  stroke="#666" stroke-width="1.5" fill="#1a1a1a"/>
+      <circle cx="28" cy="28" r="8"  stroke="#666" stroke-width="1.5" fill="#111"/>
       <circle cx="28" cy="28" r="3"  fill="#888"/>
       <g stroke="#555" stroke-width="1.5">
         <line x1="28" y1="4"    x2="28" y2="10"/>
@@ -211,7 +274,6 @@
   </div>
 
   <div class="imp-body">
-
     <div class="meta-grid">
       <div class="meta-cell">
         <div class="meta-label">RECIPIENT</div>
@@ -219,7 +281,7 @@
       </div>
       <div class="meta-cell">
         <div class="meta-label">SENDER</div>
-        <div class="meta-val">AGT. ██████████</div>
+        <div class="meta-val">AGT. &#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</div>
       </div>
       <div class="meta-cell">
         <div class="meta-label">CLEARANCE</div>
@@ -227,13 +289,13 @@
       </div>
       <div class="meta-cell">
         <div class="meta-label">TRANSMISSION DATE</div>
-        <div class="meta-val">████.██.██ / ██:██ IST</div>
+        <div class="meta-val">&#9608;&#9608;&#9608;&#9608;.&#9608;&#9608;.&#9608;&#9608; / &#9608;&#9608;:&#9608;&#9608; IST</div>
       </div>
     </div>
 
     <div class="priority-bar">
       <div class="pip"></div>
-      <span>PRIORITY: OMEGA — RESPOND IMMEDIATELY</span>
+      <span>PRIORITY: IMPERIAL RED — RESPOND IMMEDIATELY</span>
     </div>
 
     <div class="section-head">FIELD REPORT // CORUSCANT SECTOR</div>
@@ -248,7 +310,7 @@
     <div class="cipher-block">
       <div>
         <div class="cipher-label">INTERCEPTED SEQUENCE</div>
-        <div class="cipher">3-15-18-21 &nbsp;/&nbsp; 19-11-5-25</div>
+        <div class="cipher-val">3-15-18-21 &nbsp;/&nbsp; 19-11-5-25</div>
       </div>
       <div class="enc-tag">CIPHER-A1 // STANDARD</div>
     </div>
@@ -261,14 +323,12 @@
       </div>
       <div id="result">AWAITING INPUT<span class="blink">_</span></div>
     </div>
-
   </div>
 
   <div class="imp-footer">
     <span>ISB DISPATCH SYSTEM v4.2.1 // CORUSCANT NODE</span>
     <span>LONG LIVE THE EMPIRE</span>
   </div>
-
 </div>
 
 <script>
