@@ -1,1 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RI</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #050905;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    .terminal {
+      font-family: 'Courier New', Courier, monospace;
+      background: #0a0a0a;
+      color: #b0c4b0;
+      padding: 2rem;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 680px;
+      position: relative;
+      overflow: hidden;
+    }
+    .scanline {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+    }
+    .content { position: relative; z-index: 2; }
+    .header {
+      text-align: center;
+      border-bottom: 1px solid #2a3a2a;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .agency { font-size: 11px; letter-spacing: 6px; color: #4a7a4a; margin-bottom: 4px; }
+    .title  { font-size: 20px; letter-spacing: 3px; color: #8ab88a; }
+    .subtitle { font-size: 10px; letter-spacing: 4px; color: #3a5a3a; margin-top: 4px; }
+    .stamp {
+      display: inline-block;
+      border: 2px solid #8b1a1a;
+      color: #c42b2b;
+      font-size: 13px;
+      letter-spacing: 5px;
+      padding: 4px 16px;
+      margin: 1rem auto;
+      font-weight: bold;
+      transform: rotate(-2deg);
+    }
+    .field { font-size: 11px; color: #4a7a4a; margin-bottom: 4px; letter-spacing: 1px; }
+    .field span { color: #8ab88a; }
+    hr { border: none; border-top: 1px solid #1e2e1e; margin: 1rem 0; }
+    .open-tag { font-size: 11px; color: #3a5a3a; }
+    .body-text { font-size: 13px; color: #8ab88a; line-height: 1.8; margin-bottom: 1.5rem; }
+    .cipher {
+      background: #0e130e;
+      border: 1px solid #2a3a2a;
+      border-left: 3px solid #4a7a4a;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0 1.5rem;
+      letter-spacing: 2px;
+      font-size: 15px;
+      color: #c8e0c8;
+    }
+    .decrypt-label { font-size: 11px; color: #4a7a4a; letter-spacing: 2px; margin-bottom: 6px; }
+    .input-row { display: flex; gap: 8px; }
+    input[type="text"] {
+      background: #0e130e;
+      border: 1px solid #2a3a2a;
+      color: #c8e0c8;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      letter-spacing: 2px;
+      padding: 8px 12px;
+      flex: 1;
+      outline: none;
+      border-radius: 2px;
+    }
+    input[type="text"]:focus { border-color: #4a7a4a; }
+    button {
+      background: transparent;
+      border: 1px solid #4a7a4a;
+      color: #8ab88a;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+    button:hover { background: #1a2a1a; }
+    #result { font-size: 12px; margin-top: 12px; letter-spacing: 2px; min-height: 20px; }
+    .wrong { color: #c42b2b; }
+    .correct { color: #4aaa4a; }
+    .cursor {
+      display: inline-block; width: 8px; height: 13px;
+      background: #4a7a4a; vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+</head>
+<body>
+<div class="terminal">
+  <div class="scanline"></div>
+  <div class="content">
 
+    <div class="header">
+      <div class="agency">REPUBLIC INTELLIGENCE</div>
+      <div class="title">— SECURE CHANNEL —</div>
+      <div class="subtitle">ENCRYPTED TRANSMISSION · DO NOT FORWARD</div>
+    </div>
+
+    <div style="text-align:center; margin-bottom:1.5rem;">
+      <div class="stamp">CLASSIFIED</div>
+    </div>
+
+    <div class="field">TO: <span>Deputy Director 'Spark'</span></div>
+    <div class="field">FROM: <span>AGT. ██████████</span></div>
+    <div class="field">CLEARANCE: <span>CL-1</span></div>
+    <div class="field">DATE: <span>████-██-██</span></div>
+
+    <hr>
+    <div class="open-tag">&lt;:: OPEN REPORT ::</div>
+    <hr>
+
+    <div class="body-text">
+      We've intercepted encrypted transmissions from an unknown source
+      within the Coruscant System. We believe one of our own may be
+      feeding fleet routes to the Confederacy.<br><br>
+      The transmission repeats these key numbers:
+    </div>
+
+    <div class="cipher">3-15-18-21 &nbsp;/&nbsp; 19-11-5-25</div>
+
+    <div class="decrypt-label">DECRYPT &gt; SUBMIT</div>
+    <div class="input-row">
+      <input type="text" id="answer" placeholder="enter decrypted word..." autocomplete="off" />
+      <button onclick="check()">TRANSMIT</button>
+    </div>
+    <div id="result"><span class="cursor"></span></div>
+
+  </div>
+</div>
+
+<script>
+  function check() {
+    const val = document.getElementById('answer').value.trim().toUpperCase();
+    const el  = document.getElementById('result');
+    const clean = val.replace(/[\s\/]/g, '');
+    if (clean === 'CORUSKEY') {
+      el.textContent = '[ ACCESS GRANTED — WELCOME, AGENT ]';
+      el.className = 'correct';
+    } else {
+      el.textContent = '[ DECRYPTION FAILED — TRY AGAIN ]';
+      el.className = 'wrong';
+    }
+  }
+  document.getElementById('answer').addEventListener('keydown', e => {
+    if (e.key === 'Enter') check();
+  });
+</script>
+</body>
+</html>
