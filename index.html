@@ -3,166 +3,288 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ISB</title>
+  <title>ISB Dispatch</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      background: #070807;
+      background: #050505;
       display: flex;
       justify-content: center;
       align-items: flex-start;
       min-height: 100vh;
       padding: 2rem 1rem;
     }
-    .terminal {
+
+    .imp {
       font-family: 'Courier New', Courier, monospace;
-      background: #0a0a0a;
-      color: #b0c4b0;
-      padding: 2rem;
-      border-radius: 4px;
+      background: #0d0d0d;
+      color: #cccccc;
       width: 100%;
       max-width: 680px;
-      position: relative;
-      overflow: hidden;
+      border: 2px solid #444;
     }
-    .scanline {
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg, transparent, transparent 2px,
-        rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
-      );
-      pointer-events: none;
+
+    .imp-topbar {
+      background: #1a1a1a;
+      border-bottom: 2px solid #444;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .content { position: relative; z-index: 2; }
-    .header {
-      text-align: center;
-      border-bottom: 1px solid #2a3a2a;
-      padding-bottom: 1rem;
+    .imp-topbar .dots { display: flex; gap: 6px; }
+    .imp-topbar .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #333;
+      border: 1px solid #555;
+    }
+    .imp-topbar .sys { font-size: 10px; letter-spacing: 3px; color: #555; }
+
+    .imp-header {
+      background: #111;
+      border-bottom: 1px solid #333;
+      padding: 1.5rem 2rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .imp-cog { flex-shrink: 0; width: 56px; height: 56px; }
+    .imp-brand .empire { font-size: 10px; letter-spacing: 5px; color: #666; margin-bottom: 2px; }
+    .imp-brand .title  { font-size: 17px; letter-spacing: 4px; color: #e8e8e8; font-weight: bold; }
+    .imp-brand .sub    { font-size: 9px; letter-spacing: 3px; color: #555; margin-top: 3px; }
+
+    .imp-body { padding: 1.5rem 2rem; }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid #2a2a2a;
       margin-bottom: 1.5rem;
     }
-    .agency { font-size: 11px; letter-spacing: 6px; color: #4a7a4a; margin-bottom: 4px; }
-    .title  { font-size: 20px; letter-spacing: 3px; color: #8ab88a; }
-    .subtitle { font-size: 10px; letter-spacing: 4px; color: #3a5a3a; margin-top: 4px; }
-    .stamp {
-      display: inline-block;
-      border: 2px solid #8b1a1a;
-      color: #c42b2b;
-      font-size: 13px;
-      letter-spacing: 5px;
-      padding: 4px 16px;
-      margin: 1rem auto;
-      font-weight: bold;
-      transform: rotate(-2deg);
-    }
-    .field { font-size: 11px; color: #4a7a4a; margin-bottom: 4px; letter-spacing: 1px; }
-    .field span { color: #8ab88a; }
-    hr { border: none; border-top: 1px solid #1e2e1e; margin: 1rem 0; }
-    .open-tag { font-size: 11px; color: #3a5a3a; }
-    .body-text { font-size: 13px; color: #8ab88a; line-height: 1.8; margin-bottom: 1.5rem; }
-    .cipher {
-      background: #0e130e;
-      border: 1px solid #2a3a2a;
-      border-left: 3px solid #4a7a4a;
-      padding: 1rem 1.25rem;
-      margin: 1rem 0 1.5rem;
-      letter-spacing: 2px;
-      font-size: 15px;
-      color: #c8e0c8;
-    }
-    .decrypt-label { font-size: 11px; color: #4a7a4a; letter-spacing: 2px; margin-bottom: 6px; }
-    .input-row { display: flex; gap: 8px; }
-    input[type="text"] {
-      background: #0e130e;
-      border: 1px solid #2a3a2a;
-      color: #c8e0c8;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 14px;
-      letter-spacing: 2px;
+    .meta-cell {
       padding: 8px 12px;
+      border-right: 1px solid #2a2a2a;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .meta-cell:nth-child(2n)       { border-right: none; }
+    .meta-cell:nth-last-child(-n+2){ border-bottom: none; }
+    .meta-label { font-size: 9px; letter-spacing: 3px; color: #555; margin-bottom: 2px; }
+    .meta-val   { font-size: 12px; color: #bbb; letter-spacing: 1px; }
+
+    .priority-bar {
+      background: #1a0000;
+      border: 1px solid #5a0000;
+      border-left: 4px solid #cc0000;
+      padding: 8px 14px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .priority-bar .pip { width: 8px; height: 8px; background: #cc0000; border-radius: 50%; flex-shrink: 0; }
+    .priority-bar span { font-size: 10px; letter-spacing: 3px; color: #cc4444; }
+
+    .section-head {
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: #555;
+      border-bottom: 1px solid #222;
+      padding-bottom: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .report-text { font-size: 12px; color: #aaa; line-height: 1.9; margin-bottom: 1.5rem; }
+
+    .cipher-block {
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-top: 3px solid #666;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+    .cipher-label { font-size: 9px; letter-spacing: 3px; color: #555; margin-bottom: 6px; }
+    .cipher-val   { font-size: 16px; letter-spacing: 3px; color: #e8e8e8; }
+    .enc-tag {
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: #555;
+      border: 1px solid #333;
+      padding: 4px 8px;
+    }
+
+    .input-section { border-top: 1px solid #222; padding-top: 1.25rem; }
+    .input-label   { font-size: 9px; letter-spacing: 3px; color: #555; margin-bottom: 8px; }
+    .input-row     { display: flex; }
+
+    input[type="text"] {
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-right: none;
+      color: #e8e8e8;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 13px;
+      letter-spacing: 3px;
+      padding: 10px 14px;
       flex: 1;
       outline: none;
-      border-radius: 2px;
+      height: 40px;
     }
-    input[type="text"]:focus { border-color: #4a7a4a; }
+    input[type="text"]:focus { border-color: #666; }
+
     button {
-      background: transparent;
-      border: 1px solid #4a7a4a;
-      color: #8ab88a;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      color: #aaa;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 11px;
-      letter-spacing: 2px;
-      padding: 8px 16px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      padding: 10px 18px;
       cursor: pointer;
-      border-radius: 2px;
+      height: 40px;
+      white-space: nowrap;
     }
-    button:hover { background: #1a2a1a; }
-    #result { font-size: 12px; margin-top: 12px; letter-spacing: 2px; min-height: 20px; }
-    .wrong { color: #c42b2b; }
-    .correct { color: #4aaa4a; }
-    .cursor {
-      display: inline-block; width: 8px; height: 13px;
-      background: #4a7a4a; vertical-align: middle;
-      animation: blink 1s step-end infinite;
+    button:hover { background: #252525; color: #e8e8e8; }
+
+    #result {
+      font-size: 10px;
+      letter-spacing: 3px;
+      margin-top: 10px;
+      min-height: 18px;
+      color: #555;
     }
+    #result.fail { color: #993333; }
+    #result.ok   { color: #4a8a4a; }
+
+    .imp-footer {
+      background: #111;
+      border-top: 1px solid #222;
+      padding: 8px 2rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .imp-footer span { font-size: 9px; letter-spacing: 2px; color: #3a3a3a; }
+
+    .blink { animation: blink 1.2s step-end infinite; }
     @keyframes blink { 50% { opacity: 0; } }
   </style>
 </head>
 <body>
-<div class="terminal">
-  <div class="scanline"></div>
-  <div class="content">
+<div class="imp">
 
-    <div class="header">
-      <div class="agency">IMPERIAL SECURITY BUREAU</div>
-      <div class="title">— SECURE CHANNEL —</div>
-      <div class="subtitle">ENCRYPTED TRANSMISSION · DO NOT FORWARD</div>
+  <div class="imp-topbar">
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="sys">ISB // HOLONET SECURE NODE 7714-D</div>
+    <div class="sys">CONN: ENCRYPTED</div>
+  </div>
+
+  <div class="imp-header">
+    <svg class="imp-cog" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="28" cy="28" r="26" stroke="#444" stroke-width="1.5" fill="#0d0d0d"/>
+      <circle cx="28" cy="28" r="19" stroke="#555" stroke-width="1" fill="none"/>
+      <circle cx="28" cy="28" r="8"  stroke="#666" stroke-width="1.5" fill="#1a1a1a"/>
+      <circle cx="28" cy="28" r="3"  fill="#888"/>
+      <g stroke="#555" stroke-width="1.5">
+        <line x1="28" y1="4"    x2="28" y2="10"/>
+        <line x1="28" y1="46"   x2="28" y2="52"/>
+        <line x1="4"  y1="28"   x2="10" y2="28"/>
+        <line x1="46" y1="28"   x2="52" y2="28"/>
+        <line x1="10.8" y1="10.8" x2="15.1" y2="15.1"/>
+        <line x1="40.9" y1="40.9" x2="45.2" y2="45.2"/>
+        <line x1="45.2" y1="10.8" x2="40.9" y2="15.1"/>
+        <line x1="15.1" y1="40.9" x2="10.8" y2="45.2"/>
+      </g>
+    </svg>
+    <div class="imp-brand">
+      <div class="empire">GALACTIC EMPIRE</div>
+      <div class="title">IMPERIAL SECURITY BUREAU</div>
+      <div class="sub">CLASSIFIED INTELLIGENCE DISPATCH // EYES ONLY</div>
+    </div>
+  </div>
+
+  <div class="imp-body">
+
+    <div class="meta-grid">
+      <div class="meta-cell">
+        <div class="meta-label">RECIPIENT</div>
+        <div class="meta-val">DIRECTOR TARKIN</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">SENDER</div>
+        <div class="meta-val">AGT. ██████████</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">CLEARANCE</div>
+        <div class="meta-val">OBSIDIAN BLACK</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-label">TRANSMISSION DATE</div>
+        <div class="meta-val">████.██.██ / ██:██ IST</div>
+      </div>
     </div>
 
-    <div style="text-align:center; margin-bottom:1.5rem;">
-      <div class="stamp">CLASSIFIED</div>
+    <div class="priority-bar">
+      <div class="pip"></div>
+      <span>PRIORITY: IMPERIAL RED — RESPOND IMMEDIATELY</span>
     </div>
 
-    <div class="field">TO: <span>Deputy Director 'Spark'</span></div>
-    <div class="field">FROM: <span>AGT. ██████████</span></div>
-    <div class="field">CLEARANCE: <span>CL-1</span></div>
-    <div class="field">DATE: <span>████-██-██</span></div>
-
-    <hr>
-    <div class="open-tag">&lt;:: OPEN REPORT ::</div>
-    <hr>
-
-    <div class="body-text">
-  your mom<br><br>
-     lol
+    <div class="section-head">FIELD REPORT // CORUSCANT SECTOR</div>
+    <div class="report-text">
+      We have intercepted encrypted transmissions originating from within the
+      Coruscant System. Analysis suggests a high-ranking operative within the
+      Bureau may be funneling fleet patrol routes to Rebel sympathizers.<br><br>
+      The following sequence was recovered from the transmission. Decrypt and
+      submit the passphrase for further orders to be unlocked.
     </div>
 
-    <div class="cipher">3-15-18-21 &nbsp;/&nbsp; 19-11-5-25</div>
-
-    <div class="decrypt-label">DECRYPT &gt; SUBMIT</div>
-    <div class="input-row">
-      <input type="text" id="answer" placeholder="enter decrypted word..." autocomplete="off" />
-      <button onclick="check()">TRANSMIT</button>
+    <div class="cipher-block">
+      <div>
+        <div class="cipher-label">INTERCEPTED SEQUENCE</div>
+        <div class="cipher-val">3-15-18-21 &amp;nbsp;/&amp;nbsp; 19-11-5-25</div>
+      </div>
+      <div class="enc-tag">CIPHER-A1 // STANDARD</div>
     </div>
-    <div id="result"><span class="cursor"></span></div>
+
+    <div class="input-section">
+      <div class="input-label">SUBMIT DECRYPTION &gt;&gt;</div>
+      <div class="input-row">
+        <input type="text" id="answer" placeholder="ENTER PASSPHRASE..." autocomplete="off" />
+        <button onclick="check()">TRANSMIT</button>
+      </div>
+      <div id="result">AWAITING INPUT<span class="blink">_</span></div>
+    </div>
 
   </div>
+
+  <div class="imp-footer">
+    <span>ISB DISPATCH SYSTEM v4.2.1 // CORUSCANT NODE</span>
+    <span>LONG LIVE THE EMPIRE</span>
+  </div>
+
 </div>
 
 <script>
   function check() {
-    const val = document.getElementById('answer').value.trim().toUpperCase();
-    const el  = document.getElementById('result');
-    const clean = val.replace(/[\s\/]/g, '');
+    var val   = document.getElementById('answer').value.trim().toUpperCase();
+    var el    = document.getElementById('result');
+    var clean = val.replace(/[\s\/]/g, '');
     if (clean === 'CORUSKEY') {
-      el.textContent = '[ ACCESS GRANTED — WELCOME, AGENT ]';
-      el.className = 'correct';
-    } else {
-      el.textContent = '[ DECRYPTION FAILED — TRY AGAIN ]';
-      el.className = 'wrong';
+      el.textContent = '[ ACCESS GRANTED // WELCOME, AGENT. FURTHER ORDERS INCOMING. ]';
+      el.className = 'ok';
+    } else if (clean.length > 0) {
+      el.textContent = '[ DECRYPTION FAILED // UNAUTHORIZED ACCESS LOGGED ]';
+      el.className = 'fail';
     }
   }
-  document.getElementById('answer').addEventListener('keydown', e => {
+  document.getElementById('answer').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') check();
   });
 </script>
