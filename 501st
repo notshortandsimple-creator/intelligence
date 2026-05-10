@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>501st Legion Handbook</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #050505;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .imp {
+      font-family: 'Courier New', Courier, monospace;
+      background: #0a0a0a;
+      color: #cccccc;
+      width: 100%;
+      max-width: 680px;
+      border: 2px solid #444;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .holo-flicker {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(200,200,200,0.012) 3px,
+        rgba(200,200,200,0.012) 4px
+      );
+      animation: flicker 8s infinite;
+    }
+
+    .holo-sweep {
+      position: absolute;
+      left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, rgba(200,200,200,0.03), transparent);
+      pointer-events: none;
+      z-index: 11;
+      animation: sweep 6s linear infinite;
+    }
+
+    .holo-vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9;
+      box-shadow: inset 0 0 80px rgba(0,0,0,0.7);
+    }
+
+    @keyframes flicker {
+      0%,100%  { opacity: 1; }
+      92%      { opacity: 1; }
+      92.5%    { opacity: 0.82; }
+      93%      { opacity: 1; }
+      96%      { opacity: 1; }
+      96.3%    { opacity: 0.88; }
+      96.6%    { opacity: 1; }
+    }
+
+    @keyframes sweep {
+      0%   { top: -60px; }
+      100% { top: 100%; }
+    }
+
+    .imp-topbar {
+      background: #111;
+      border-bottom: 1px solid #333;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 5;
+    }
+    .dots { display: flex; gap: 6px; }
+    .dot  { width: 10px; height: 10px; border-radius: 50%; background: #222; border: 1px solid #444; }
+    .sys  { font-size: 10px; letter-spacing: 3px; color: #555; }
+
+    .imp-header {
+      background: #0d0d0d;
+      border-bottom: 2px solid #1a3a6a;
+      padding: 1.5rem 2rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 5;
+    }
+    .legion-crest { flex-shrink: 0; width: 64px; height: 64px; }
+    .empire      { font-size: 9px; letter-spacing: 5px; color: #2a5a9a; margin-bottom: 3px; }
+    .brand-title { font-size: 18px; letter-spacing: 4px; color: #e8e8e8; font-weight: bold; text-shadow: 0 0 14px rgba(80,140,255,0.3); }
+    .brand-sub   { font-size: 9px; letter-spacing: 3px; color: #2a5a9a; margin-top: 3px; }
+    .brand-tag   { font-size: 9px; letter-spacing: 2px; color: #1a3a6a; margin-top: 2px; }
+
+    .imp-body { padding: 1.5rem 2rem; position: relative; z-index: 5; }
+
+    .induction-bar {
+      background: #050d1a;
+      border: 1px solid #1a3a6a;
+      border-left: 4px solid #2255aa;
+      padding: 8px 14px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .induction-bar .pip {
+      width: 8px; height: 8px;
+      background: #2255cc;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pippulse 2s ease-in-out infinite;
+    }
+    @keyframes pippulse { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+    .induction-bar span { font-size: 10px; letter-spacing: 3px; color: #4488cc; }
+
+    .section { margin-bottom: 2rem; }
+
+    .section-head {
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: #2a5a9a;
+      border-bottom: 1px solid #0e1e3a;
+      padding-bottom: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .body-text { font-size: 12px; color: #aaa; line-height: 1.95; }
+    .body-text b { color: #c8c8c8; font-weight: normal; letter-spacing: 1px; }
+
+    .rank-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid #0e1e3a;
+      margin-top: 0.75rem;
+    }
+    .rank-cell {
+      padding: 7px 12px;
+      border-bottom: 1px solid #0e1e3a;
+      border-right: 1px solid #0e1e3a;
+      font-size: 11px;
+    }
+    .rank-cell.label { color: #4488cc; font-size: 10px; letter-spacing: 2px; }
+    .rank-cell.val   { color: #999; border-right: none; }
+    .rank-cell:nth-last-child(-n+2) { border-bottom: none; }
+
+    .code-list { margin-top: 0.75rem; }
+    .code-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid #0a1020;
+      font-size: 12px;
+      color: #999;
+      line-height: 1.7;
+    }
+    .code-item:last-child { border-bottom: none; }
+    .code-num { color: #1a4a8a; flex-shrink: 0; font-size: 10px; letter-spacing: 2px; padding-top: 2px; }
+
+    .equip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.75rem; }
+    .equip-card {
+      background: #080d15;
+      border: 1px solid #0e1e3a;
+      border-top: 2px solid #1a3a6a;
+      padding: 10px 12px;
+    }
+    .equip-name { font-size: 10px; letter-spacing: 3px; color: #4488cc; margin-bottom: 4px; }
+    .equip-desc { font-size: 11px; color: #777; line-height: 1.6; }
+
+    .chain-block {
+      background: #060c18;
+      border: 1px solid #0e1e3a;
+      padding: 1rem 1.25rem;
+      margin-top: 0.75rem;
+    }
+    .chain-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid #0a1525;
+      font-size: 11px;
+    }
+    .chain-row:last-child { border-bottom: none; }
+    .chain-rank  { width: 160px; flex-shrink: 0; color: #4488cc; font-size: 10px; letter-spacing: 2px; }
+    .chain-name  { color: #999; }
+    .chain-arrow { color: #1a3a6a; font-size: 14px; }
+
+    .closing-bar {
+      background: #060c18;
+      border: 1px solid #0e1e3a;
+      border-top: 3px solid #1a3a6a;
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+    }
+    .closing-label { font-size: 9px; letter-spacing: 3px; color: #2a5a9a; margin-bottom: 6px; }
+    .closing-text  { font-size: 11px; color: #666; line-height: 1.8; }
+    .closing-text span { color: #999; }
+
+    .imp-footer {
+      background: #0a0f1a;
+      border-top: 1px solid #0e1e3a;
+      padding: 8px 2rem;
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      z-index: 5;
+    }
+    .imp-footer span { font-size: 9px; letter-spacing: 2px; color: #1a3a6a; }
+  </style>
+</head>
+<body>
+<div class="imp">
+  <div class="holo-flicker"></div>
+  <div class="holo-sweep"></div>
+  <div class="holo-vignette"></div>
+
+  <div class="imp-topbar">
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="sys">501ST // HOLONET FIELD TERMINAL // CLASSIFIED</div>
+    <div class="sys">CONN: ENCRYPTED</div>
+  </div>
+
+  <div class="imp-header">
+    <svg class="legion-crest" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="32" r="30" stroke="#1a3a6a" stroke-width="1.5" fill="#050d1a"/>
+      <circle cx="32" cy="32" r="22" stroke="#2255aa" stroke-width="1" fill="none"/>
+      <circle cx="32" cy="32" r="10" stroke="#2255aa" stroke-width="1.5" fill="#0a1525"/>
+      <circle cx="32" cy="32" r="4"  fill="#2255cc"/>
+      <g stroke="#1a3a6a" stroke-width="1.5">
+        <line x1="32" y1="4"    x2="32" y2="12"/>
+        <line x1="32" y1="52"   x2="32" y2="60"/>
+        <line x1="4"  y1="32"   x2="12" y2="32"/>
+        <line x1="52" y1="32"   x2="60" y2="32"/>
+        <line x1="12.5" y1="12.5" x2="18" y2="18"/>
+        <line x1="46"   y1="46"   x2="51.5" y2="51.5"/>
+        <line x1="51.5" y1="12.5" x2="46" y2="18"/>
+        <line x1="18"   y1="46"   x2="12.5" y2="51.5"/>
+      </g>
+      <text x="32" y="36" text-anchor="middle" font-size="10" fill="#4488cc" font-family="Courier New" letter-spacing="1">501</text>
+    </svg>
+    <div>
+      <div class="empire">GRAND ARMY OF THE REPUBLIC // GALACTIC EMPIRE</div>
+      <div class="brand-title">501ST LEGION</div>
+      <div class="brand-sub">"VADER'S FIST" // THE TORRENT</div>
+      <div class="brand-tag">FIELD HANDBOOK // RESTRICTED DISTRIBUTION</div>
+    </div>
+  </div>
+
+  <div class="imp-body">
+
+    <div class="induction-bar">
+      <div class="pip"></div>
+      <span>TROOPER INDUCTION DOCUMENT // DO NOT DISTRIBUTE BEYOND AUTHORIZED PERSONNEL</span>
+    </div>
+
+    <!-- SECTION I -->
+    <div class="section">
+      <div class="section-head">SECTION I // WELCOME &amp; INDUCTION</div>
+      <div class="body-text">
+        Trooper.<br><br>
+        You have been selected to serve among the finest soldiers in the galaxy. The <b>501ST LEGION</b> is no ordinary unit. We are the tip of the spear — the first boots on the ground, the last line standing. Our reputation has been earned in blood, fire, and unwavering loyalty across countless engagements on every front.<br><br>
+        This handbook is your first order. Read it. Memorize it. Live by it. From this moment forward, you do not belong to yourself. You belong to the Legion, and through the Legion, to the <b>EMPIRE</b>.<br><br>
+        Welcome to Vader's Fist. Do not make us regret the choice.
+      </div>
+    </div>
+
+    <!-- SECTION II -->
+    <div class="section">
+      <div class="section-head">SECTION II // LEGION HISTORY &amp; ORIGINS</div>
+      <div class="body-text">
+        The 501st Legion was forged in the crucible of galactic war. Activated at the outset of the Clone Wars, the Legion distinguished itself through superior discipline, tactical ingenuity, and an unbroken record of mission success. Where other units faltered, the 501st held the line.<br><br>
+        Under the command of the <b>SUPREME COMMANDER</b>, the Legion executed some of the most pivotal operations of the war — assaults that shaped the course of galactic history. When the Republic gave way to the <b>GALACTIC EMPIRE</b>, the 501st transitioned without hesitation, their loyalty absolute and unconditional.<br><br>
+        Today the Legion serves as the personal vanguard of <b>LORD VADER</b> himself. To wear the blue is to carry the weight of that history. To serve in the 501st is the highest honour a soldier of the Empire can hold — and the most demanding.
+      </div>
+    </div>
+
+    <!-- SECTION III -->
+    <div class="section">
+      <div class="section-head">SECTION III // CHAIN OF COMMAND</div>
+      <div class="body-text">All orders flow through the chain. Deviation is insubordination. Insubordination is failure. Failure is not tolerated.</div>
+      <div class="chain-block">
+        <div class="chain-row">
+          <div class="chain-rank">SUPREME AUTHORITY</div>
+          <div class="chain-arrow">&#9658;</div>
+          <div class="chain-name">LORD VADER // DARK LORD OF THE SITH</div>
+        </div>
+        <div class="chain-row">
+          <div class="chain-rank">LEGION COMMANDER</div>
+          <div class="chain-arrow">&#9658;</div>
+          <div class="chain-name">COMMANDER, 501ST LEGION</div>
+        </div>
+        <div class="chain-row">
+          <div class="chain-rank">BATTALION COMMAND</div>
+          <div class="chain-arrow">&#9658;</div>
+          <div class="chain-name">BATTALION COMMANDERS // SENIOR OFFICERS</div>
+        </div>
+        <div class="chain-row">
+          <div class="chain-rank">COMPANY LEVEL</div>
+          <div class="chain-arrow">&#9658;</div>
+          <div class="chain-name">COMPANY CAPTAINS // UNIT LEADS</div>
+        </div>
+        <div class="chain-row">
+          <div class="chain-rank">SQUAD LEVEL</div>
+          <div class="chain-arrow">&#9658;</div>
+          <div class="chain-name">SERGEANTS // SQUAD LEADERS</div>
+        </div>
+        <div class="chain-row">
+          <div class="chain-rank">TROOPER</div>
+          <div class="chain-arrow">&#9658;</div>
+          <div class="chain-name">YOU</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION IV -->
+    <div class="section">
+      <div class="section-head">SECTION IV // RANKS &amp; INSIGNIA</div>
+      <div class="body-text">Rank is earned through performance, not tenure. Advancement is merit-based. Demotion is immediate upon failure.</div>
+      <div class="rank-grid">
+        <div class="rank-cell label">TROOPER</div>
+        <div class="rank-cell val">Standard enlisted rank. Entry level. Prove yourself.</div>
+        <div class="rank-cell label">SPECIALIST</div>
+        <div class="rank-cell val">Designated role proficiency. Sniper, medic, tech, demo.</div>
+        <div class="rank-cell label">CORPORAL</div>
+        <div class="rank-cell val">First leadership grade. Responsible for a fire team.</div>
+        <div class="rank-cell label">SERGEANT</div>
+        <div class="rank-cell val">Squad command. Accountable for all troopers below.</div>
+        <div class="rank-cell label">LIEUTENANT</div>
+        <div class="rank-cell val">Platoon command. Officer track begins here.</div>
+        <div class="rank-cell label">CAPTAIN</div>
+        <div class="rank-cell val">Company command. Full tactical authority.</div>
+        <div class="rank-cell label">COMMANDER</div>
+        <div class="rank-cell val">Senior Legion command. Reports to Lord Vader directly.</div>
+        <div class="rank-cell label">ARC TROOPER</div>
+        <div class="rank-cell val">Elite designation. Special operations. Individually selected.</div>
+      </div>
+    </div>
+
+    <!-- SECTION V -->
+    <div class="section">
+      <div class="section-head">SECTION V // CODES OF CONDUCT</div>
+      <div class="body-text">These are not suggestions. These are standing orders. Violations will be dealt with swiftly and without appeal.</div>
+      <div class="code-list">
+        <div class="code-item"><div class="code-num">01</div><div>Loyalty to the Empire is absolute. Personal allegiances, prior attachments, and civilian sympathies are to be set aside permanently upon induction.</div></div>
+        <div class="code-item"><div class="code-num">02</div><div>Orders issued through the chain of command are to be executed without hesitation, question, or delay. Seek clarification only when an order is tactically impossible, never when it is merely difficult.</div></div>
+        <div class="code-item"><div class="code-num">03</div><div>The identity of the 501st is the armour. Maintain your kit at all times. A trooper whose armour is unserviceable is a liability to the unit.</div></div>
+        <div class="code-item"><div class="code-num">04</div><div>You represent Lord Vader in every engagement. Your conduct on and off the field reflects on the Legion. Act accordingly.</div></div>
+        <div class="code-item"><div class="code-num">05</div><div>Operational security is paramount. Discuss mission details only with those who are directly involved. Loose words cost lives and compromise the Empire.</div></div>
+        <div class="code-item"><div class="code-num">06</div><div>Aid your brothers. The Legion functions as one unit. A trooper in difficulty is not their problem alone — it is the Legion's problem. Respond accordingly.</div></div>
+        <div class="code-item"><div class="code-num">07</div><div>Capture is not an option. A trooper of the 501st does not surrender. You will resist, evade, and if necessary, deny the enemy any tactical advantage at any cost.</div></div>
+        <div class="code-item"><div class="code-num">08</div><div>Insubordination, cowardice, dereliction of duty, and betrayal of the Empire are all capital offences within this Legion. There are no second chances.</div></div>
+      </div>
+    </div>
+
+    <!-- SECTION VI -->
+    <div class="section">
+      <div class="section-head">SECTION VI // EQUIPMENT PROTOCOLS</div>
+      <div class="body-text">Standard issue equipment is the trooper's responsibility. Loss or damage through negligence is a disciplinary matter.</div>
+      <div class="equip-grid">
+        <div class="equip-card">
+          <div class="equip-name">PHASE II ARMOUR</div>
+          <div class="equip-desc">Standard Legion combat armour. Blue pauldron markings denote 501st affiliation. Inspect before every deployment.</div>
+        </div>
+        <div class="equip-card">
+          <div class="equip-name">E-11 BLASTER</div>
+          <div class="equip-desc">Standard issue sidearm. Keep clean, calibrated, and charged at all times. Know your weapon as you know yourself.</div>
+        </div>
+        <div class="equip-card">
+          <div class="equip-name">COMMS UNIT</div>
+          <div class="equip-desc">Encrypted squad-band communicator. Do not use open channels for sensitive transmissions. Maintain signal discipline.</div>
+        </div>
+        <div class="equip-card">
+          <div class="equip-name">FIELD KIT</div>
+          <div class="equip-desc">Rations, medpac, emergency beacon, restraint cuffs. Contents vary by mission profile. Check your briefing.</div>
+        </div>
+        <div class="equip-card">
+          <div class="equip-name">SPECIALIST LOAD</div>
+          <div class="equip-desc">Heavy troopers, snipers, and demo specialists carry role-specific equipment as assigned. Issued pre-mission only.</div>
+        </div>
+        <div class="equip-card">
+          <div class="equip-name">HELMET HUD</div>
+          <div class="equip-desc">Squad IFF, threat overlay, vitals monitoring, and recording. The helmet stays on. No exceptions in the field.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION VII -->
+    <div class="section">
+      <div class="section-head">SECTION VII // CLOSING ORDERS</div>
+      <div class="body-text">
+        You are now a trooper of the 501st Legion. You carry the weight of our history and the honour of our name into every engagement. The galaxy will know we were here by what we leave behind.<br><br>
+        Serve with distinction. Fight without hesitation. Stand until ordered to fall back — and even then, make them pay for every step.<br><br>
+        <b>For the Empire. For the Legion. For Lord Vader.</b>
+      </div>
+      <div class="closing-bar">
+        <div class="closing-label">ISSUED BY</div>
+        <div class="closing-text">
+          <span>501ST LEGION COMMAND</span> // IMPERIAL CENTER<br>
+          CLASSIFICATION: RESTRICTED // INTERNAL USE ONLY<br>
+          UNAUTHORISED DISTRIBUTION IS AN IMPERIAL OFFENCE
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="imp-footer">
+    <span>501ST LEGION FIELD TERMINAL // RESTRICTED</span>
+    <span>FOR THE EMPIRE</span>
+  </div>
+</div>
+</body>
+</html>
